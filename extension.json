@@ -1,0 +1,21 @@
+{
+	"name": "JobManager",
+	"version": "0.0.0",
+	"author":"Ed Jamer <ed.jamer@genesys.com>",
+	"url": "https://docs.genesys.com/Special:JobManager",
+	"descriptionmsg": "JobManager-desc",
+	"license-name": "",
+	"type": "specialpage",
+	"AutoloadClasses": {
+		"SpecialJobManager": "includes/SpecialJobManager.php"
+	},
+	"SpecialPages": {
+		"JobManager": "SpecialJobManager"
+	},
+	"MessagesDirs": {
+		"JobManager": [
+			"i18n"
+		]
+	},
+	"manifest_version": 1 
+}
