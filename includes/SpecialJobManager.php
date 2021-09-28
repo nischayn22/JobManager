@@ -8,32 +8,25 @@ class SpecialJobManager extends SpecialPage {
 	}
 
 	function execute( $par ) {
-		// get the output variable to use
-		$output = $this->getOutput();
+		global $wgUser;
+		$this->checkPermissions();
 
-		// permissions check: if the user doesn't belong to the administrator user group, then prevent access to this page
-		if( ! $this->checkPermissions() ) {
-			global $wgUser;
-			$output->addHTML('<h1>' . $this->msg('jobmanager-error-title') . '</h1>');
-			$output->addHTML("<p>" . $this->msg($wgUser->isAnon() ? 'jobmanager-error-nologin' : 'jobmanager-error-docteam' ) . "</p>");
-			return;
-		}
+		$output = $this->getOutput();
+		$request = $this->getRequest();
 
 		$output->addHTML('<h1>' . $this->msg('jobmanager') . '</h1>');
 		$output->addHTML('<p>' . $this->msg('jobmanager-summary') . '</p>');
 
-		//--- run jobs is specified in page parameters ---
-		$request = $this->getRequest();
-		if ( !empty( $request->getText( 'type' ) ) ) {
+		$request_type = $request->getText( 'type' );
+
+		if ( !empty( $request_type ) ) {
 			$output->addHTML('<h2>' . $this->msg('jobmanager-processing') . '</h2>');
 
-			$type = $request->getText( 'type' );
-			if ($type=="all") {
-				$type=false;
+			if ( $request_type == "all" ) {
+				$request_type = false;
 				$output->addHTML('<p>' . $this->msg('jobmanager-jobtype') . ': (' . $this->msg('jobmanager-processing-all') . ')</p>');
-			}
-			else {
-				$output->addHTML('<p>' . $this->msg('jobmanager-jobtype') . ': ' . $type . '</p>');
+			} else {
+				$output->addHTML('<p>' . $this->msg('jobmanager-jobtype') . ': ' . $request_type . '</p>');
 			}
 
 			$maxJobs = $request->getText( 'maxJobs' );
@@ -51,29 +44,28 @@ class SpecialJobManager extends SpecialPage {
 //			$maxTime = $request->getText( 'maxTime' );
 //			$throttle = $request->getText( 'throttle' );
 
-			$this->runJobs($type, $maxJobs, false, true);
+			$this->runJobs($request_type, $maxJobs, false, true);
 		}
 
 		//--- create the job queue report ---
 		$output->addHTML('<h2>' . $this->msg('jobmanager-reporting') . '</h2>');
-		$jobs = JobQueueGroup::singleton()->getQueueSizes();
 		// cycle through the array, printing a table that details how many jobs are waiting to be processed of each type
 		$output->addHTML('<table><tr><th>' . $this->msg('jobmanager-jobtype') . '</th><th>' . $this->msg('jobmanager-jobcount') . '</th><th>' . $this->msg('jobmanager-action') . '</th></tr>');
-		if ( count($jobs) > 0 ) {
+
+		$jobs = JobQueueGroup::singleton()->getQueueSizes();
+		if ( !empty( $jobs ) ) {
 			$jobcount = 0;
-			$keys = array_keys( $jobs );
-			foreach( $keys as $key ) {
-				$output->addHTML('<tr><td>' . $key . '</td><td>' . $jobs[$key] . '</td><td>');
-				$output->addWikiText("[" . $request->getFullRequestURL() . "?type=" . $key . "&maxJobs=100 Run " . $key . " jobs now!]");
+			$job_keys = array_keys( $jobs );
+			foreach( $job_keys as $job_key ) {
+				$output->addHTML('<tr><td>' . $job_key . '</td><td>' . $jobs[$job_key] . '</td><td>');
+				$output->addWikiText("[" . $request->getFullRequestURL() . "?type=" . $job_key . "&maxJobs=100 Run " . $job_key . " jobs now!]");
 				$output->addHTML('</td></tr>');	
-				$jobcount += $jobs[$key];
+				$jobcount += $jobs[$job_key];
 			}
 			$output->addHTML('<tr><th>' . $this->msg('jobmanager-totalcount') . '</th><td>' . $jobcount . '</td><td>');
-			$output->addWikiText("[" . $request->getFullRequestURL() . "?type=all&maxJobs=100 Run all jobs now!]");
+			$output->addHTML( Linker::link( Title::newFromText( "Special:JobManager" ), "Run all jobs now!", [], ["type" => "all", "maxJobs" => 100] ) );
 			$output->addHTML('</td></tr>');
-		}
-		else {
-			// no jobs in the queue
+		} else {
 			$output->addHTML('<tr><td colspan=3><i>' . $this->msg('jobmanager-nojobs') . '</i></td></tr>');
 		}
 		$output->addHTML('</table>');
@@ -123,11 +115,6 @@ PHP Reference
 			sleep( 10 );
 		}
 		return true;
-	}
-
-	function checkPermissions($permissionGroup = 'bureaucrat') {
-		global $wgUser;
-		return in_array( $permissionGroup, $wgUser->getEffectiveGroups() );
 	}
 
 	/**

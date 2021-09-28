@@ -1,0 +1,20 @@
+{
+	"jobmanager": "MediaWiki Job Manager",
+	"jobmanager-desc": "Simple tools for reporting on and managing the MediaWiki job queue.",
+	"jobmanager-summary": "Use this page to view and manage outstanding items in the MediaWiki job queue.",
+	"jobmanager-error-title":"Permission Error",
+	"jobmanager-error-docteam":"You must be a member of the administrative permissions group.",
+	"jobmanager-error-nologin":"You must be logged in with an account that has administrative permissions.",
+	"jobmanager-processing": "Processing Existing Jobs",
+	"jobmanager-processing-all": "all enqueued job types are being processed",
+	"jobmanager-processing-maxjob-lowerlimit": "Note: When specifying a Maxjobs parameter, the minimum value is 1.",
+	"jobmanager-processing-maxjob-upperlimit": "Note: When specifying a Maxjobs parameter, the maximum value is 1000.",
+	"jobmanager-processing-wait": "Outstanding jobs were processed before creating the following report.",
+	"jobmanager-processing-maxjob": "Maximum number of jobs that were processed",
+	"jobmanager-reporting": "Report on Outstanding Jobs in Queue",
+	"jobmanager-jobtype":"Job Type",
+	"jobmanager-jobcount":"Number in Job Queue",
+	"jobmanager-action":"Available Actions (default max job size=100)",
+	"jobmanager-totalcount":"Total number of outstanding jobs",
+	"jobmanager-nojobs":"No jobs are waiting in the queue!"
+}
